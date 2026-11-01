@@ -1,0 +1,32 @@
+name: Depot Runner Smoke Test
+
+on:
+  workflow_dispatch:
+    inputs:
+      runner:
+        description: Runner to test
+        required: true
+        type: choice
+        options:
+          - windows-2022
+          - depot-windows-2022-4
+          - depot-windows-2022-8
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ${{ inputs.runner }}
+    timeout-minutes: 10
+    steps:
+      - name: Inspect hardware
+        shell: pwsh
+        run: |
+          Get-CimInstance Win32_ComputerSystem |
+            Select-Object NumberOfLogicalProcessors,
+              TotalPhysicalMemory
+          Get-CimInstance Win32_OperatingSystem |
+            Select-Object Caption, Version
+          Get-PSDrive C
+          git --version
